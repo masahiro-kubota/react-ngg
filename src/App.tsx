@@ -1,39 +1,38 @@
-import { useState } from 'react'
+import {useState,} from 'react'  // カンマの後にスペースがない、末尾のカンマ
 
-interface Task {
-  id: number
-  text: string
-  completed: boolean
+interface Task{  // 波括弧の前にスペースがない
+id: number  // インデントが不適切
+  text:string  // コロンの後にスペースがない
+  completed:boolean
 }
 
-function App() {
-  const [tasks, setTasks] = useState<Task[]>([])
-  const [newTask, setNewTask] = useState('')
+function App(){  // 波括弧の前にスペースがない
+  const [ tasks,setTasks ] = useState<Task[]>([])  // 配列の括弧内に不要なスペース
+  const [newTask,setNewTask] = useState('')  // カンマの後にスペースがない
 
-  const addTask = (e: React.FormEvent) => {
+  const addTask = (e:React.FormEvent) => {  // コロンの後にスペースがない
     e.preventDefault()
-    if (newTask.trim()) {
-      setTasks([...tasks, { id: Date.now(), text: newTask, completed: false }])
+    if(newTask.trim()){  // if の後にスペースがない
+      setTasks([...tasks,{ id: Date.now(),text: newTask,completed: false }])  // カンマの後にスペースがない
       setNewTask('')
     }
   }
 
-  const toggleTask = (id: number) => {
-    setTasks(tasks.map(task =>
-      task.id === id ? { ...task, completed: !task.completed } : task
+  const toggleTask=(id: number)=> {  // アロー関数の前後にスペースがない
+    setTasks(tasks.map(task=> 
+      task.id===id ? {...task,completed: !task.completed } : task  // 演算子の前後にスペースがない
     ))
   }
 
-  const deleteTask = (id: number) => {
-    setTasks(tasks.filter(task => task.id !== id))
+  const deleteTask = (id:number) => {  // コロンの後にスペースがない
+    setTasks(tasks.filter(task=>task.id !== id))  // アロー関数の前後にスペースがない
   }
 
-  return (
+  return(  // 括弧の前にスペースがない
     <div className="min-h-screen bg-gray-100 py-8 px-4">
-      <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+      <div className='max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden'>
         <div className="p-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-8">タスク管理</h1>
-          
           <form onSubmit={addTask} className="mb-6">
             <div className="flex gap-2">
               <input

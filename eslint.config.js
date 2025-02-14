@@ -16,25 +16,28 @@ export default [
       globals: {
         ...globals.browser,
         React: true,
-        JSX: true  // JSXをグローバルとして追加
+        JSX: true
       },
       parser: tseslint.parser,
       parserOptions: {
-        project: "./tsconfig.json",
+        project: ["./tsconfig.app.json", "./tsconfig.node.json"],  // 複数のtsconfig対応
+        tsconfigRootDir: import.meta.dirname,  // プロジェクトルートの指定
         ecmaFeatures: {
-          jsx: true  // JSXサポートを明示的に有効化
+          jsx: true
         }
       }
     },
     plugins: {
-      "@typescript-eslint": tseslint.plugin,  // TypeScriptプラグインを明示的に追加
+      "@typescript-eslint": tseslint.plugin,
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
       react: react,
     },
     rules: {
       ...js.configs.recommended.rules,
-      ...tseslint.configs.recommended.rules,
+      // 型チェック対応のルールセットに変更
+      ...tseslint.configs.recommendedTypeChecked.rules,
+      ...tseslint.configs.stylisticTypeChecked.rules,  // スタイル関連の型チェックルールを追加
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": [
         "warn",
@@ -42,8 +45,11 @@ export default [
       ],
       ...react.configs.recommended.rules,
       ...react.configs["jsx-runtime"].rules,
-      // JSX関連のエラーを抑制
-      "no-undef": "off",  // TypeScriptが型チェックを行うため、このルールは不要
+      // TypeScriptの型チェックを活用するためのカスタムルール
+      "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/explicit-function-return-type": "off",  // React関数コンポーネントの戻り値型を推論させる
+      "@typescript-eslint/strict-boolean-expressions": "warn",
+      "no-undef": "off",
     },
     settings: {
       react: {
