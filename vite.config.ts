@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/react-tailwind/",
+  base: "/react-ngg/",
   root: ".", // プロジェクトのルート
   server: {
     port: 3000, // 開発サーバーのポート番号
