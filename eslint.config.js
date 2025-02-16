@@ -20,8 +20,8 @@ export default [
       },
       parser: tseslint.parser,
       parserOptions: {
-        project: ["./tsconfig.app.json", "./tsconfig.node.json"],  // 複数のtsconfig対応
-        tsconfigRootDir: import.meta.dirname,  // プロジェクトルートの指定
+        project: ["./tsconfig.app.json", "./tsconfig.node.json"],
+        tsconfigRootDir: import.meta.dirname,
         ecmaFeatures: {
           jsx: true
         }
@@ -35,26 +35,25 @@ export default [
     },
     rules: {
       ...js.configs.recommended.rules,
-      // 型チェック対応のルールセットに変更
-      ...tseslint.configs.recommendedTypeChecked.rules,
-      ...tseslint.configs.stylisticTypeChecked.rules,  // スタイル関連の型チェックルールを追加
+      ...tseslint.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
-      "react-refresh/only-export-components": [
-        "warn",
-        { allowConstantExport: true },
-      ],
-      ...react.configs.recommended.rules,
-      ...react.configs["jsx-runtime"].rules,
-      // TypeScriptの型チェックを活用するためのカスタムルール
-      "@typescript-eslint/no-unused-vars": "warn",
-      "@typescript-eslint/explicit-function-return-type": "off",  // React関数コンポーネントの戻り値型を推論させる
-      "@typescript-eslint/strict-boolean-expressions": "warn",
-      "no-undef": "off",
-    },
-    settings: {
-      react: {
-        version: "detect",
-      },
-    },
+      // 基本的なスペーシングルール
+      "space-before-blocks": ["error", "always"],
+      "space-before-function-paren": ["error", "always"],
+      "space-infix-ops": "error",
+      "keyword-spacing": ["error", { "before": true, "after": true }],
+      "arrow-spacing": ["error", { "before": true, "after": true }],
+      "comma-spacing": ["error", { "before": false, "after": true }],
+      // 変数に関するルール
+      "no-var": "error",
+      "prefer-const": "error",
+      // 比較演算子のルール
+      "eqeqeq": "error",
+      // React固有のルール
+      "react/jsx-tag-spacing": ["error", {
+        "beforeSelfClosing": "always"
+      }],
+      "react/jsx-equals-spacing": ["error", "never"],
+    }
   }
 ];
