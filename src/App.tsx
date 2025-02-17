@@ -5,48 +5,64 @@ interface UserAnswer {
 }
 
 class GameLogic {
-  private secretNumber: number
-  private maxAttempts: number
-  private attempts: number
+  #_secretNumber: number;
+  #_maxAttempts: number
+  #_attempts: number
 
   constructor(secretNumber: number, maxAttempts: number) {
-    this.secretNumber = secretNumber;
-    this.maxAttempts = maxAttempts;
-    this.attempts = 0;
+    this.#_secretNumber = secretNumber;
+    this.#_maxAttempts = maxAttempts;
+    this.#_attempts = 0;
+  }
+
+  get remainingAttempts() {
+    return this.#_maxAttempts - this.#_attempts;
   }
 
   checkAnswer(answer: number): string {
-    this.attempts++;
-    if (this.attempts >= this.maxAttempts) {
+    this.#_attempts++;
+    if (this.#_attempts >= this.#_maxAttempts) {
+      this.resetGame(this.#_secretNumber, this.#_maxAttempts);
       return '試行回数が上限に達しました。';
-      this.resetGame(this.secretNumber, this.maxAttempts);
     }
-    if (answer === this.secretNumber) {
+    if (answer === this.#_secretNumber) {
       return '正解です！';
-    } else if (answer < this.secretNumber) {
+    } else if (answer < this.#_secretNumber) {
       return 'もっと大きい数字です。';
     } else {
       return 'もっと小さい数字です。';
     }
   }
+
   resetGame(secretNumber: number, maxAttempts: number) {
-    this.secretNumber = secretNumber;
-    this.maxAttempts = maxAttempts;
-    this.attempts = 0;
+    this.#_secretNumber = secretNumber;
+    this.#_maxAttempts = maxAttempts;
+    this.#_attempts = 0;
   }
 }
 
 
 export default function App () { 
-  const [gameLogic] = useState<GameLogic>(new GameLogic(43, 10));
+  const [gameLogic, setGameLogic] = useState<GameLogic>(new GameLogic(43, 10));
   const [userAnswer, setUserAnswer] = useState<UserAnswer>({answer: 0})
+  const [remainingAttempts, setRemainingAttempts] = useState<number>(gameLogic.remainingAttempts);
+  const [result, setResult] = useState<string>('');
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const result = gameLogic.checkAnswer(userAnswer.answer);
     // 非同期なので最新の回答はconsole.log反映されない。
+    setRemainingAttempts(gameLogic.remainingAttempts);
+    setResult(result);
     console.log(result);
   }
+  const handleReset = () => {
+    setGameLogic(new GameLogic(43, 10));
+    setResult('');
+    setRemainingAttempts(gameLogic.remainingAttempts);
+  }
+
   return (
+    // ゲームクラスとのアダプタをAppコンポーネントの中で実装する。
     <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-lg">
       <h1 className="text-2xl font-bold text-center mb-6">Number Guessing Game</h1>
       <form onSubmit={ handleSubmit } className="mb-6">
@@ -71,13 +87,17 @@ export default function App () {
         </button>
       </form>
       <div className="mt-6 p-4 bg-gray-100 rounded-lg">
+        <p className="text-center text-gray-700 mb-2">
+          { result }
+        </p>
         <p className="text-center text-gray-700">
-          残り試行回数: 10回
+          残り試行回数: { remainingAttempts }回
         </p>
       </div>
       <div className="mt-6 rounded-lg">
         <button
           type="button"
+          onClick={handleReset}
           className="w-full bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-colors"
         >
           Reset
