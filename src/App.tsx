@@ -4,15 +4,47 @@ interface UserAnswer {
   answer: number
 }
 
+class GameLogic {
+  private secretNumber: number
+  private maxAttempts: number
+  private attempts: number
+
+  constructor(secretNumber: number, maxAttempts: number) {
+    this.secretNumber = secretNumber;
+    this.maxAttempts = maxAttempts;
+    this.attempts = 0;
+  }
+
+  checkAnswer(answer: number): string {
+    this.attempts++;
+    if (this.attempts >= this.maxAttempts) {
+      return '試行回数が上限に達しました。';
+      this.resetGame(this.secretNumber, this.maxAttempts);
+    }
+    if (answer === this.secretNumber) {
+      return '正解です！';
+    } else if (answer < this.secretNumber) {
+      return 'もっと大きい数字です。';
+    } else {
+      return 'もっと小さい数字です。';
+    }
+  }
+  resetGame(secretNumber: number, maxAttempts: number) {
+    this.secretNumber = secretNumber;
+    this.maxAttempts = maxAttempts;
+    this.attempts = 0;
+  }
+}
+
 
 export default function App () { 
+  const [gameLogic] = useState<GameLogic>(new GameLogic(43, 10));
   const [userAnswer, setUserAnswer] = useState<UserAnswer>({answer: 0})
-  const [userAnswerList, setUserAnswerList] = useState<UserAnswer[]>([])
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setUserAnswerList([...userAnswerList, userAnswer]);
+    const result = gameLogic.checkAnswer(userAnswer.answer);
     // 非同期なので最新の回答はconsole.log反映されない。
-    console.log(userAnswerList);
+    console.log(result);
   }
   return (
     <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-lg">
@@ -24,7 +56,7 @@ export default function App () {
               name="answer"
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               onChange={(e) => setUserAnswer({ answer: Number(e.target.value) })}
-              placeholder="1~100の数字を入力してください"
+              placeholder="1~100の数字を入力してくさい"
               min="1"
               max="100"
               required
