@@ -1,4 +1,4 @@
-import {useState, FormEvent} from 'react'
+import {useState, FormEvent, ChangeEvent} from 'react'
 
 interface UserAnswer {
   answer: number
@@ -9,17 +9,17 @@ class GameLogic {
   #_maxAttempts: number
   #_attempts: number
 
-  constructor(secretNumber: number, maxAttempts: number) {
+  constructor (secretNumber: number, maxAttempts: number) {
     this.#_secretNumber = secretNumber;
     this.#_maxAttempts = maxAttempts;
     this.#_attempts = 0;
   }
 
-  get remainingAttempts() {
+  get remainingAttempts () {
     return this.#_maxAttempts - this.#_attempts;
   }
 
-  checkAnswer(answer: number): string {
+  checkAnswer (answer: number): string {
     this.#_attempts++;
     if (this.#_attempts >= this.#_maxAttempts) {
       this.resetGame(this.#_secretNumber, this.#_maxAttempts);
@@ -34,15 +34,25 @@ class GameLogic {
     }
   }
 
-  resetGame(secretNumber: number, maxAttempts: number) {
+  resetGame (secretNumber: number, maxAttempts: number) {
     this.#_secretNumber = secretNumber;
     this.#_maxAttempts = maxAttempts;
     this.#_attempts = 0;
   }
 }
 
+interface GameState {
+  remainingAttempts: number;
+  result: string;
+}
 
-export default function App () { 
+interface GameAction {
+  handleChange: (e: ChangeEvent<HTMLInputElement>) => void;  // eslint-disable-line no-unused-vars
+  handleReset: () => void;
+  handleSubmit: (e: FormEvent<HTMLFormElement>) => void;  // eslint-disable-line no-unused-vars
+}
+
+export function useGameState (): [GameState, GameAction] {
   const [gameLogic, setGameLogic] = useState<GameLogic>(new GameLogic(43, 10));
   const [userAnswer, setUserAnswer] = useState<UserAnswer>({answer: 0})
   const [remainingAttempts, setRemainingAttempts] = useState<number>(gameLogic.remainingAttempts);
@@ -61,6 +71,22 @@ export default function App () {
     setRemainingAttempts(gameLogic.remainingAttempts);
   }
 
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setUserAnswer({ answer: Number(e.target.value) });
+  }
+  return [
+    { remainingAttempts, result },
+    { handleSubmit, handleReset, handleChange }
+  ]
+}
+
+export default function App () { 
+  //すべてのuseStateをカスタムフックでまとめて管理
+  const [
+    { remainingAttempts, result }, 
+    { handleSubmit, handleReset, handleChange }
+  ] = useGameState();
+
   return (
     // ゲームクラスとのアダプタをAppコンポーネントの中で実装する。
     <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-lg">
@@ -71,7 +97,7 @@ export default function App () {
               type="number"
               name="answer"
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onChange={(e) => setUserAnswer({ answer: Number(e.target.value) })}
+              onChange={ handleChange }
               placeholder="1~100の数字を入力してくさい"
               min="1"
               max="100"
